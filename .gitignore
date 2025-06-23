@@ -1,2 +1,4 @@
 data/RAVDESS/
 src/augmented_data/
+
+src/__pycache__/
