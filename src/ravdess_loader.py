@@ -60,7 +60,9 @@ def collate_pad(batch):
     return padded, torch.tensor(labels), torch.tensor(lengths)
 
 
-a = RAVDESSDataSet(dir = "augmented_data/RAVDESS/train")
+REPO_ROOT = Path(__file__).resolve().parent  
+DATA_DIR = REPO_ROOT / "augmented_data" / "RAVDESS" / "train"
+a = RAVDESSDataSet(dir=DATA_DIR)
 
 a.__getitem__(0)
 
