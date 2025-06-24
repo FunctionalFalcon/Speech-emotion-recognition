@@ -44,11 +44,13 @@ class RAVDESSDataSet(Dataset):
         if sample_rate != self.target_sample_rate:
             resampler = torchaudio.transforms.Resample(orig_freq= sample_rate, new_freq= self.target_sample_rate)
             waveform = resampler(waveform)
+        if waveform.shape[0] > 1:
+            waveform = waveform.mean(dim = 0, keepdim = True)
         melspectro = self._mel(waveform).log1p()
         return melspectro.squeeze(0), label
-        print(f"Shape: {melspectro.shape}")
-        print(sample_path)
-        print(f"Label: {self.label_name}, IDX: {self.label}")
+#        print(f"Shape: {melspectro.shape}")
+#        print(sample_path)
+#        print(f"Label: {self.label_name}, IDX: {self.label}")
 
 def collate_pad(batch):
     feats, labels = zip(*batch)
@@ -60,12 +62,8 @@ def collate_pad(batch):
     return padded, torch.tensor(labels), torch.tensor(lengths)
 
 
-REPO_ROOT = Path(__file__).resolve().parent  
-DATA_DIR = REPO_ROOT / "augmented_data" / "RAVDESS" / "train"
-a = RAVDESSDataSet(dir=DATA_DIR)
+#REPO_ROOT = Path(__file__).resolve().parent  
+#DATA_DIR = REPO_ROOT / "augmented_data" / "RAVDESS" / "train"
+#a = RAVDESSDataSet(dir=DATA_DIR)
+#x,y = a.__getitem__(0)
 
-a.__getitem__(0)
-
-#print(torchaudio.list_audio_backends())
-
-#import librosa
