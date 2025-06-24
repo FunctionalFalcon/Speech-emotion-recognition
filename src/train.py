@@ -3,34 +3,54 @@ import numpy as np
 from ravdess_loader import RAVDESSDataSet, collate_pad
 from models.cnn_lstm   import CRNN
 
-from sklearn.metrics import recall_score
+from sklearn.metrics import recall_score, accuracy_score
 from torch.utils.data import DataLoader
+from pathlib import Path
 
 def train_epoch(model, loader, crit, optim, device):
-    model.train(); losses=[]
-    for x,y,L in loader:
-        x,y,L = x.to(device), y.to(device), L.to(device)
-        optim.zero_grad(); loss = crit(model(x,L), y); loss.backward(); optim.step()
+    model.train()
+    losses = []
+    preds = []
+    gts = []
+    for x, y, L in loader:
+        x, y, L = x.to(device), y.to(device), L.to(device)
+        optim.zero_grad()
+        logits = model(x, L)
+        loss = crit(logits, y)
+        loss.backward()
+        optim.step()
         losses.append(loss.item())
-    return np.mean(losses)
+        preds.append(logits.argmax(1).cpu())
+        gts.append(y.cpu())
+    acc = accuracy_score(torch.cat(gts), torch.cat(preds))
+    return np.mean(losses), acc
 
 def evaluate(model, loader, crit, device):
-    model.eval(); losses=[]; preds=[]; gts=[]
+    model.eval
+    losses=[]
+    preds=[]
+    gts=[]
     with torch.no_grad():
         for x,y,L in loader:
             x,y,L = x.to(device), y.to(device), L.to(device)
-            logits = model(x,L); losses.append(crit(logits,y).item())
-            preds.append(logits.argmax(1).cpu()); gts.append(y.cpu())
+            logits = model(x,L) 
+            losses.append(crit(logits,y).item())
+            preds.append(logits.argmax(1).cpu())
+            gts.append(y.cpu())
     ua = recall_score(torch.cat(gts), torch.cat(preds), average="macro")
-    return np.mean(losses), ua
+    acc = accuracy_score(torch.cat(gts), torch.cat(preds))
+    return np.mean(losses), ua, acc
 
 # ---------------------------
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-TRAIN_DIR = "augmented_data/RAVDESS/train"
-VAL_DIR = "augmented_data/RAVDESS/val"
-BATCH_SIZE = 64
-LR = 0.00001
+
+REPO_ROOT = Path(__file__).resolve().parent  
+TRAIN_DIR = REPO_ROOT / "augmented_data/RAVDESS/train"
+VAL_DIR = REPO_ROOT / "augmented_data/RAVDESS/val"
+BATCH_SIZE = 128
+LR = 0.0001
 EPOCHS = 10
+
 #  Main
 # ---------------------------
 if __name__ == "__main__":
@@ -45,7 +65,7 @@ if __name__ == "__main__":
 
     best=0
     for epoch in range(1, EPOCHS+1):
-        tr_loss = train_epoch(model, train_dl, crit, optim, DEVICE)
-        val_loss, ua = evaluate(model, val_dl, crit, DEVICE)
-        best = max(best, ua)
-        print(f"Epoch {epoch:02}/{EPOCHS}  train_loss {tr_loss:.3f} | val_UA {ua:.3f} (best {best:.3f})")
+        tr_loss, tr_ac = train_epoch(model, train_dl, crit, optim, DEVICE)
+        val_loss, ua, ac = evaluate(model, val_dl, crit, DEVICE)
+        best = max(best, ac)
+        print(f"Epoch {epoch:02}/{EPOCHS}  train_loss {tr_loss:.3f} | train_accuray {tr_ac:.3f} |  val_accuracy {ac:.3f} | val_UA {ua:.3f} (best ac {best:.3f})")
