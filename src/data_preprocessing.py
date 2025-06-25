@@ -2,10 +2,11 @@ import os
 import shutil
 import random
 from glob import glob
-
+from pathlib import Path
 # input và output
-input_folder = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "RAVDESS")
-output_folder = os.path.join(os.path.dirname(__file__), "augmented_data", "RAVDESS")
+REPO_ROOT = Path(__file__).resolve().parent.parent
+input_folder = REPO_ROOT / "data" / "RAVDESS"
+output_folder = REPO_ROOT / "src" /  "augmented_data" / "RAVDESS"
 
 splits = ["train", "val", "test"]
 ratios = [0.7, 0.15, 0.15]
