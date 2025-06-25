@@ -1,7 +1,13 @@
+# Raw Data
 data/RAVDESS/*
 !data/RAVDESS/.gitkeep
 
+# Training Data
 src/augmented_data/
-artifacts/*/checkpoints/
 
+# Model artifacts
+src/artifacts/*/checkpoints/
+
+# Python cache
 __pycache__/
+*.pyc
