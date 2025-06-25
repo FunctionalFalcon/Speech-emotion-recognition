@@ -1,4 +1,6 @@
-data/RAVDESS/
+data/RAVDESS/*
+!data/RAVDESS/.gitkeep
+
 src/augmented_data/
 artifacts/*/checkpoints/
 
