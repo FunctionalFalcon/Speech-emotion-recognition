@@ -1,4 +1,5 @@
 data/RAVDESS/
 src/augmented_data/
+artifacts/*/checkpoints/
 
 __pycache__/
