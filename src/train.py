@@ -94,6 +94,8 @@ def save_visualizations(model_name, all_gts, all_preds, train_accs, val_accs, tr
     plt.savefig(os.path.join(result_dir, "loss.png"))
     plt.close()
 
+def count_parameters(model):
+    return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
 # ---------------------------
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -115,9 +117,16 @@ if __name__ == "__main__":
     val_dl   = DataLoader(val_dataset,
                           batch_size=BATCH_SIZE, shuffle=False, collate_fn=collate_pad)
 
-    model = ECLR(n_classes = 8).to(DEVICE)
+    model = CRNN(n_classes = 8).to(DEVICE)
     optim = torch.optim.AdamW(model.parameters(), lr=LR, weight_decay=1e-4)
     crit  = nn.CrossEntropyLoss()
+
+    # Display total params 
+    num_params = count_parameters(model)
+    print(f"Model: {model.__class__.__name__}")
+    print(f"Total trainable parameters: {num_params:,}")
+    print("-" * 50)
+
 
     train_accs, val_accs = [], []
     train_losses, val_losses = [], []
