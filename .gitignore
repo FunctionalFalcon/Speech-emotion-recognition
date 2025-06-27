@@ -1,6 +1,7 @@
 # Raw Data
 data/RAVDESS/*
 !data/RAVDESS/.gitkeep
+data/background_noises/*
 
 # Training Data
 src/augmented_data/

@@ -52,8 +52,7 @@ class ECLR(nn.Module):
             nn.Linear(128 * 2, 64),
             nn.ReLU(),
             nn.Dropout(0.3),
-            nn.Linear(64, n_classes),
-            nn.Softmax(dim=1)
+            nn.Linear(64, n_classes)
         )
 
 
