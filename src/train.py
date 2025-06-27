@@ -4,8 +4,13 @@ import os
 import matplotlib.pyplot as plt
 
 from ravdess_loader import RAVDESSDataSet, collate_pad
-from models.cnn_lstm   import CRNN
-from models.cnn_eclr   import ECLR
+from models.cnn_lstm import CRNN
+from models.cnn_eclr import ECLR
+from models.resnet_ser import ResNetSER
+from models.attention_ser import AttentionSER
+from models.tcn_ser import TCNSER
+from models.mobilenet_ser import MobileNetSER
+from models.ensemble_ser import EnsembleSER, AdaptiveEnsembleSER
 
 from sklearn.metrics import recall_score, accuracy_score, f1_score, confusion_matrix, ConfusionMatrixDisplay
 from torch.utils.data import DataLoader
@@ -117,7 +122,7 @@ if __name__ == "__main__":
     val_dl   = DataLoader(val_dataset,
                           batch_size=BATCH_SIZE, shuffle=False, collate_fn=collate_pad)
 
-    model = CRNN(n_classes = 8).to(DEVICE)
+    model = ResNetSER(n_classes = 8).to(DEVICE)
     optim = torch.optim.AdamW(model.parameters(), lr=LR, weight_decay=1e-4)
     crit  = nn.CrossEntropyLoss()
 
@@ -145,12 +150,14 @@ if __name__ == "__main__":
         print(f"Epoch {epoch:02}/{EPOCHS}  train_loss {tr_loss:.3f} | train_acc {tr_ac:.3f} | train_f1 {tr_f1:.3f} | val_acc {ac:.3f} | val_f1 {val_f1:.3f} | val_UA {ua:.3f} | (best ac {best:.3f})")
 
     # save model
-    model_name = model.__class__.__name__
-    save_dir = os.path.join("artifacts", model_name, "checkpoints")
-    os.makedirs(save_dir, exist_ok=True) 
-    save_path = os.path.join(save_dir, f"{model_name}.pth")
-    torch.save(model.state_dict(), save_path)
+    save_model = True
+    if save_model:
+        model_name = model.__class__.__name__
+        save_dir = os.path.join("artifacts", model_name, "checkpoints")
+        os.makedirs(save_dir, exist_ok=True) 
+        save_path = os.path.join(save_dir, f"{model_name}.pth")
+        torch.save(model.state_dict(), save_path)
 
-    # visualization
-    save_visualizations(model_name, all_gts, all_preds, train_accs, val_accs, train_losses, val_losses, train_dataset.class_to_idx)
-
+        # visualization
+        save_visualizations(model_name, all_gts, all_preds, train_accs, val_accs, train_losses, val_losses, train_dataset.class_to_idx)
+        
