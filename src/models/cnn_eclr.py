@@ -7,13 +7,16 @@ class ECLR(nn.Module):
     def __init__(self, n_classes):
         super().__init__()
         r = 4 # MBConv expansion rate
-        C1, C2, C3 = 32,64,128
+        C1, C2, C3 = 32, 64, 128
+
+        freq_dim = 144
+        freq_after_pools = freq_dim // 8
 
         self.bl1 = nn.Sequential(
             nn.Conv2d(1, C1, kernel_size=3, padding=1),
             nn.BatchNorm2d(C1),
             nn.ReLU(),
-            nn.MaxPool2d((2, 2)),  # (32,64, T/2)
+            nn.MaxPool2d((2, 2)),  # (32, freq_dim / 2, T/2)
         )
         
 
@@ -22,7 +25,7 @@ class ECLR(nn.Module):
             nn.Conv2d(C1, C2, kernel_size=1),
             nn.BatchNorm2d(C2),
             nn.ReLU(),
-            nn.MaxPool2d((2, 2)),  # (64,32, T/4)
+            nn.MaxPool2d((2, 2)),  # (64, freq_dim / 4, T/4)
         )
 
 
@@ -35,12 +38,12 @@ class ECLR(nn.Module):
             nn.ReLU(),
             nn.Conv2d(C2*r, C3, kernel_size = 1),
             nn.BatchNorm2d(C3),
-            nn.MaxPool2d((2,2))     # (128,16, T/8)
+            nn.MaxPool2d((2,2))     # (128, freq_dim / 8, T/8)
         )
 
 
         self.lstm = nn.LSTM(
-            input_size = C3 * 16,
+            input_size = C3 * freq_after_pools,
             hidden_size = 128,
             num_layers = 2,
             batch_first = True,
@@ -57,7 +60,7 @@ class ECLR(nn.Module):
 
 
     def forward(self, x, lengths):
-        # x: (B, 1, 128, Tpad)
+        # x: (B, 1, freq_dim, Tpad)
         x = self.bl1(x)
         x = self.bl2(x)
         x = self.bl3(x)  # (B, C, F=16, T=Tp/8)

@@ -6,11 +6,6 @@ import matplotlib.pyplot as plt
 from ravdess_loader import RAVDESSDataSet, collate_pad
 from models.cnn_lstm import CRNN
 from models.cnn_eclr import ECLR
-from models.resnet_ser import ResNetSER
-from models.attention_ser import AttentionSER
-from models.tcn_ser import TCNSER
-from models.mobilenet_ser import MobileNetSER
-from models.ensemble_ser import EnsembleSER, AdaptiveEnsembleSER
 
 from sklearn.metrics import recall_score, accuracy_score, f1_score, confusion_matrix, ConfusionMatrixDisplay
 from torch.utils.data import DataLoader
@@ -110,19 +105,19 @@ TRAIN_DIR = REPO_ROOT / "augmented_data/RAVDESS/train"
 VAL_DIR = REPO_ROOT / "augmented_data/RAVDESS/val"
 BATCH_SIZE = 128
 LR = 0.0001
-EPOCHS = 10
+EPOCHS = 50
 
 #  Main
 # ---------------------------
 if __name__ == "__main__":
-    train_dataset = RAVDESSDataSet(dir = TRAIN_DIR)
-    val_dataset = RAVDESSDataSet(dir = VAL_DIR)
+    train_dataset = RAVDESSDataSet(dir = TRAIN_DIR, features="not mel")
+    val_dataset = RAVDESSDataSet(dir = VAL_DIR, features="not mel")  
     train_dl = DataLoader(train_dataset,
                           batch_size=BATCH_SIZE, shuffle=True, collate_fn=collate_pad)
     val_dl   = DataLoader(val_dataset,
                           batch_size=BATCH_SIZE, shuffle=False, collate_fn=collate_pad)
 
-    model = ResNetSER(n_classes = 8).to(DEVICE)
+    model = ECLR(n_classes = 8).to(DEVICE)
     optim = torch.optim.AdamW(model.parameters(), lr=LR, weight_decay=1e-4)
     crit  = nn.CrossEntropyLoss()
 
@@ -160,4 +155,3 @@ if __name__ == "__main__":
 
         # visualization
         save_visualizations(model_name, all_gts, all_preds, train_accs, val_accs, train_losses, val_losses, train_dataset.class_to_idx)
-        
