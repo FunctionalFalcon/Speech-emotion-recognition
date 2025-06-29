@@ -13,5 +13,5 @@ src/artifacts/*/checkpoints/
 __pycache__/
 *.pyc
 
-# Project Report
+# Report
 Latex Report/
