@@ -6,10 +6,14 @@ import matplotlib.pyplot as plt
 from ravdess_loader import RAVDESSDataSet, collate_pad
 from models.cnn_lstm import CRNN
 from models.cnn_eclr import ECLR
+from models.eclra import ECLRA
 
 from sklearn.metrics import recall_score, accuracy_score, f1_score, confusion_matrix, ConfusionMatrixDisplay
 from torch.utils.data import DataLoader
 from pathlib import Path
+
+import warnings
+warnings.filterwarnings("ignore")
 
 def train_epoch(model, loader, crit, optim, device):
     model.train()
@@ -104,8 +108,8 @@ REPO_ROOT = Path(__file__).resolve().parent
 TRAIN_DIR = REPO_ROOT / "augmented_data/RAVDESS/train"
 VAL_DIR = REPO_ROOT / "augmented_data/RAVDESS/val"
 BATCH_SIZE = 128
-LR = 0.0001
-EPOCHS = 50
+LR = 0.001
+EPOCHS = 60
 
 #  Main
 # ---------------------------
@@ -117,7 +121,7 @@ if __name__ == "__main__":
     val_dl   = DataLoader(val_dataset,
                           batch_size=BATCH_SIZE, shuffle=False, collate_fn=collate_pad)
 
-    model = ECLR(n_classes = 8).to(DEVICE)
+    model = ECLRA(n_classes = 8).to(DEVICE)
     optim = torch.optim.AdamW(model.parameters(), lr=LR, weight_decay=1e-4)
     crit  = nn.CrossEntropyLoss()
 
@@ -142,7 +146,7 @@ if __name__ == "__main__":
         val_losses.append(val_loss)
         train_accs.append(tr_ac)
         val_accs.append(ac)
-        print(f"Epoch {epoch:02}/{EPOCHS}  train_loss {tr_loss:.3f} | train_acc {tr_ac:.3f} | train_f1 {tr_f1:.3f} | val_acc {ac:.3f} | val_f1 {val_f1:.3f} | val_UA {ua:.3f} | (best ac {best:.3f})")
+        print(f"Epoch {epoch:02}/{EPOCHS}  train_loss {tr_loss:.3f} | train_acc {tr_ac:.3f} | train_f1 {tr_f1:.3f} | val_loss {val_loss:.3f} |val_acc {ac:.3f} | val_f1 {val_f1:.3f} | val_UA {ua:.3f} | (best ac {best:.3f})")
 
     # save model
     save_model = True
