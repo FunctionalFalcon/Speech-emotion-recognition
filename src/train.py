@@ -58,7 +58,7 @@ def evaluate(model, loader, crit, device):
     return np.mean(losses), ua, acc, f1, all_gts, all_preds
 
 def save_visualizations(model_name, all_gts, all_preds, train_accs, val_accs, train_losses, val_losses, class_to_idx):
-    result_dir = os.path.join("artifacts", model_name, "results")
+    result_dir = os.path.join("src/artifacts", model_name, "results")
     os.makedirs(result_dir, exist_ok=True)
 
     idx_to_class = {v:k for k,v in class_to_idx.items()}
@@ -109,7 +109,7 @@ TRAIN_DIR = REPO_ROOT / "augmented_data/RAVDESS/train"
 VAL_DIR = REPO_ROOT / "augmented_data/RAVDESS/val"
 BATCH_SIZE = 128
 LR = 0.001
-EPOCHS = 60
+EPOCHS = 100
 
 #  Main
 # ---------------------------
@@ -131,31 +131,54 @@ if __name__ == "__main__":
     print(f"Total trainable parameters: {num_params:,}")
     print("-" * 50)
 
-
     train_accs, val_accs = [], []
     train_losses, val_losses = [], []
     best=0
     best_state = None
+    
+    # Early stopping parameters
+    PATIENCE = 15
+    best_val_acc = float(0)
+    early_stop_counter = 0
+    early_stop_triggered = False
+
+    best_model_path = os.path.join("src/artifacts", model.__class__.__name__, "checkpoints", f"{model.__class__.__name__}.pth")
+
+
     for epoch in range(1, EPOCHS+1):
         tr_loss, tr_ac, tr_f1 = train_epoch(model, train_dl, crit, optim, DEVICE)
         val_loss, ua, ac, val_f1, all_gts, all_preds = evaluate(model, val_dl, crit, DEVICE)
-        if ac > best:
-            best = ac
-            best_state = model.state_dict().copy()
+        
+        if ac > best_val_acc:
+            best_val_acc = ac
+            best_state = model.state_dict()
+            early_stop_counter = 0
+            os.makedirs(os.path.dirname(best_model_path), exist_ok=True)
+            torch.save(best_state, best_model_path)
+        else:
+            early_stop_counter += 1
+            if early_stop_counter >= PATIENCE:
+                print(f"Early stopping triggered after {PATIENCE} epochs without improvement.")
+                early_stop_triggered = True
+                break
+            
         train_losses.append(tr_loss)
         val_losses.append(val_loss)
         train_accs.append(tr_ac)
         val_accs.append(ac)
-        print(f"Epoch {epoch:02}/{EPOCHS}  train_loss {tr_loss:.3f} | train_acc {tr_ac:.3f} | train_f1 {tr_f1:.3f} | val_loss {val_loss:.3f} |val_acc {ac:.3f} | val_f1 {val_f1:.3f} | val_UA {ua:.3f} | (best ac {best:.3f})")
+        print(f"Epoch {epoch:02}/{EPOCHS}  train_loss {tr_loss:.3f} | train_acc {tr_ac:.3f} | val_loss {val_loss:.3f} | val_acc {ac:.3f} | (best ac {best_val_acc:.3f})")
 
     # save model
     save_model = True
     if save_model:
+        
         model_name = model.__class__.__name__
-        save_dir = os.path.join("artifacts", model_name, "checkpoints")
+        """
+        save_dir = os.path.join("src/artifacts", model_name, "checkpoints")
         os.makedirs(save_dir, exist_ok=True) 
         save_path = os.path.join(save_dir, f"{model_name}.pth")
         torch.save(model.state_dict(), save_path)
+        """
 
         # visualization
         save_visualizations(model_name, all_gts, all_preds, train_accs, val_accs, train_losses, val_losses, train_dataset.class_to_idx)

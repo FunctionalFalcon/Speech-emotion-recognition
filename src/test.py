@@ -10,6 +10,9 @@ from models.cnn_eclr import ECLR
 from models.eclra import ECLRA
 from torch.utils.data import DataLoader
 
+import warnings
+warnings.filterwarnings("ignore")
+
 # Set device
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(" Using device:", DEVICE)
@@ -18,9 +21,9 @@ if DEVICE.type == 'cuda':
 
 # Paths
 REPO_ROOT = Path(__file__).resolve().parent.parent
-MODEL_PATH = REPO_ROOT / "artifacts/ECLRA/checkpoints/ECLRA.pth"
+MODEL_PATH = REPO_ROOT / "src/artifacts/ECLRA/checkpoints/ECLRA.pth"
 VAL_DIR = REPO_ROOT / "src/augmented_data/RAVDESS/val"
-RESULT_DIR = REPO_ROOT / "artifacts/ECLRA/results"
+RESULT_DIR = REPO_ROOT / "src/artifacts/ECLRA/results"
 os.makedirs(RESULT_DIR, exist_ok=True)
 
 # Load dataset
