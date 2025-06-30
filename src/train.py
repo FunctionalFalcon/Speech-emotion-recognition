@@ -108,7 +108,7 @@ REPO_ROOT = Path(__file__).resolve().parent
 TRAIN_DIR = REPO_ROOT / "augmented_data/RAVDESS/train"
 VAL_DIR = REPO_ROOT / "augmented_data/RAVDESS/val"
 BATCH_SIZE = 128
-LR = 0.001
+LR = 0.0005
 EPOCHS = 100
 
 #  Main
