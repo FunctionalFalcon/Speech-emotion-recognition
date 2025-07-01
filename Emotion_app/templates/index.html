@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speech Emotion Recognition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            width: 90%;
+            max-width: 600px;
+            text-align: center;
+        }
+        
+        h1 {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+        }
+        
+        .recorder-container {
+            margin: 2rem 0;
+        }
+        
+        .record-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 70px;
+            height: 70px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+        }
+        
+        .record-btn:hover {
+            background-color: var(--secondary);
+            transform: scale(1.05);
+        }
+        
+        .record-btn.recording {
+            background-color: var(--danger);
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(247, 37, 133, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(247, 37, 133, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(247, 37, 133, 0); }
+        }
+        
+        .visualizer {
+            width: 100%;
+            height: 100px;
+            background-color: #f1f3f5;
+            border-radius: 10px;
+            margin: 1.5rem 0;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        canvas {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .result-container {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            border-radius: 10px;
+            background-color: #f8f9fa;
+            transition: all 0.5s ease;
+        }
+        
+        .emotion-display {
+            font-size: 2rem;
+            font-weight: 600;
+            margin: 1rem 0;
+            transition: all 0.3s ease;
+        }
+        
+        .emotion-text {
+            font-size: 1.2rem;
+            color: var(--dark);
+        }
+        
+        .timer {
+            font-size: 1.2rem;
+            color: var(--dark);
+            margin: 1rem 0;
+        }
+        
+        .instructions {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-top: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Speech Emotion Recognition</h1>
+        <p class="instructions">Click the microphone button and speak naturally to detect your emotional state</p>
+        
+        <div class="recorder-container">
+            <div class="visualizer">
+                <canvas id="visualizer"></canvas>
+            </div>
+            
+            <button id="recordButton" class="record-btn">
+                <i class="fas fa-microphone"></i>
+            </button>
+            
+            <div class="timer" id="timer">00:00</div>
+        </div>
+        
+        <div class="result-container" id="resultContainer" style="display: none;">
+            <div class="emotion-text">Detected Emotion:</div>
+            <div class="emotion-display" id="emotionDisplay">Neutral</div>
+            <div class="emotion-text" id="confidenceText">Confidence: 85%</div>
+        </div>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
