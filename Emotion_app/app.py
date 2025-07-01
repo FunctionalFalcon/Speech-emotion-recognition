@@ -14,6 +14,9 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(" Using device:", DEVICE)
 if DEVICE.type == 'cuda':
     print("   > GPU:", torch.cuda.get_device_name(0))
+    
+# Paths
+REPO_ROOT = Path(__file__).resolve().parent.parent
 
 class AudioFeatureExtractor:
     def __init__(self, sample_rate=16000, duration=3):
@@ -88,7 +91,7 @@ class AudioFeatureExtractor:
 app = Flask(__name__)
 
 # Load model (replace with your actual model)
-MODEL_PATH = Path(r"C:\Users\DELL\MyDrive\Desktop\DPL301\Project3\Speech-emotion-recognition\Emotion_app\model\ECLRA.pth")
+MODEL_PATH = REPO_ROOT / "Emotion_app/model/ECLRA.pth"
 model = ECLRA(n_classes=8).to(DEVICE)
 assert MODEL_PATH.exists(), f" Model file not found: {MODEL_PATH}"
 
