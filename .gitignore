@@ -16,3 +16,6 @@ __pycache__/
 
 # Report
 Latex Report/
+
+# Web app
+uploads/
