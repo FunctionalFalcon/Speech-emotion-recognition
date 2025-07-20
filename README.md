@@ -1,6 +1,3 @@
-# Speech-emotion-recognition
-
-truly suffering
 
 # Speech Emotion Recognition with ECLRA
 
