@@ -16,23 +16,26 @@ Metrics: Accuracy, F1, UA Recall
 # Quick Start
 
 ### Step 1: Clone repo
+```bash
 git clone https://github.com/FunctionalFalcon/Speech-emotion-recognition.git
 cd Speech-emotion-recognition
-
+```
 ### Step 2: Prepare data
 Place RAVDESS dataset in data/RAVDESS/
 
 ### Step 3: Preprocess
+```bash
 cd src/data
 python preprocessing.py
-
+```
 ### Step 4: Train
-cd ..
-python train.py
-
+```bash
+cd python train.py
+```
 ### Step 5: Evaluate
+```bash
 python test.py
-
+```
 
 
 # Model Architecture
