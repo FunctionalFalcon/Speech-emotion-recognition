@@ -43,3 +43,8 @@ Input → MBConv Blocks → BiLSTM × 2 → Attention → FC → Softmax
 Metric	Score
 Val Accuracy	~77%
 UA Recall	~75%
+
+# How to use
+```bash
+python Emotion_app/app.py
+```
